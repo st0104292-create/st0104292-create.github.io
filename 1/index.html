@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>打地鼠遊戲（有聲音）</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: #f0f8ff;
+  margin: 0;
+  padding: 0;
+}
+h1 { margin-top: 20px; }
+#game {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+}
+.hole {
+  width: 100px;
+  height: 100px;
+  background: #8B4513;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+.mole {
+  width: 80px;
+  height: 80px;
+  background: url('https://i.imgur.com/1kFzqzX.png') no-repeat center center;
+  background-size: cover;
+  position: absolute;
+  bottom: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: bottom 0.3s;
+}
+.mole.up {
+  bottom: 0;
+}
+#score, #timer {
+  font-size: 24px;
+  margin-top: 15px;
+}
+#startBtn {
+  margin-top: 20px;
+  font-size: 18px;
+  padding: 10px 20px;
+}
+</style>
+</head>
+<body>
+
+<h1>打地鼠遊戲（有聲音）</h1>
+<div id="score">分數: 0</div>
+<div id="timer">時間: 30</div>
+<div id="game"></div>
+<button id="startBtn">開始遊戲</button>
+<button id="bellBtn" style="margin-left: 10px; font-size: 18px; padding: 10px 20px;">🔔 聖誕鈴聲</button>
+
+<audio id="hitSound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
+<audio id="bellSound" src="https://assets.mixkit.co/active_storage/sfx/2795/2795-preview.mp3"></audio>
+
+<script>
+const game = document.getElementById('game');
+const scoreDisplay = document.getElementById('score');
+const timerDisplay = document.getElementById('timer');
+const startBtn = document.getElementById('startBtn');
+const hitSound = document.getElementById('hitSound');
+const bellSound = document.getElementById('bellSound');
+
+let score = 0;
+let time = 30;
+let gameInterval;
+let countdownInterval;
+
+// 建立 9 個洞
+for (let i = 0; i < 9; i++) {
+  const hole = document.createElement('div');
+  hole.classList.add('hole');
+  
+  const mole = document.createElement('div');
+  mole.classList.add('mole');
+  hole.appendChild(mole);
+
+  const hitMole = () => {
+    if (mole.classList.contains('up')) {
+      score++;
+      scoreDisplay.textContent = "分數: " + score;
+      mole.classList.remove('up');
+      hitSound.currentTime = 0;
+      hitSound.play();
+    }
+  }
+
+  hole.addEventListener('click', hitMole);
+  hole.addEventListener('touchstart', (e) => { e.preventDefault(); hitMole(); });
+
+  game.appendChild(hole);
+}
+
+// 隨機彈出地鼠
+function showMole() {
+  const moles = document.querySelectorAll('.mole');
+  moles.forEach(m => m.classList.remove('up'));
+
+  const index = Math.floor(Math.random() * moles.length);
+  moles[index].classList.add('up');
+
+  setTimeout(() => moles[index].classList.remove('up'), 700);
+}
+
+// 遊戲開始
+function startGame() {
+  score = 0;
+  time = 30;
+  scoreDisplay.textContent = "分數: " + score;
+  timerDisplay.textContent = "時間: " + time;
+
+  clearInterval(gameInterval);
+  clearInterval(countdownInterval);
+
+  // 先播放一次音效，啟動手機瀏覽器音效權限
+  hitSound.play().catch(() => {});
+
+  gameInterval = setInterval(showMole, 1000);
+
+  countdownInterval = setInterval(() => {
+    time--;
+    timerDisplay.textContent = "時間: " + time;
+    if (time <= 0) {
+      clearInterval(gameInterval);
+      clearInterval(countdownInterval);
+      alert("遊戲結束！你的分數是: " + score);
+    }
+  }, 1000);
+}
+
+// 播放聖誕鈴聲功能
+function playBellSound() {
+  bellSound.currentTime = 0;
+  bellSound.play().catch(() => {});
+}
+
+startBtn.addEventListener('click', startGame);
+document.getElementById('bellBtn').addEventListener('click', playBellSound);
+</script>
+
+</body>
+</html>
