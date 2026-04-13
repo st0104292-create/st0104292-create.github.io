@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>打地鼠遊戲</title>
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    font-family: Arial, sans-serif;
+    background-color: #a3d2ca;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    margin-bottom: 10px;
+  }
+  #game {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-gap: 15px;
+    margin-top: 20px;
+  }
+  .hole {
+    width: 100px;
+    height: 100px;
+    background-color: #5eaaa8;
+    border-radius: 50%;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  .mole {
+    width: 80px;
+    height: 80px;
+    background-color: #f5cb5c;
+    border-radius: 50%;
+    position: absolute;
+    bottom: -80px;
+    left: 10px;
+    transition: bottom 0.2s;
+  }
+  .mole.up {
+    bottom: 10px;
+  }
+  #score {
+    font-size: 20px;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+<h1>打地鼠遊戲</h1>
+<button id="startBtn">開始遊戲</button>
+<div id="score">分數: 0</div>
+<div id="game">
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+  <div class="hole"><div class="mole"></div></div>
+</div>
+
+<audio id="hitSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+
+<script>
+const holes = document.querySelectorAll('.hole');
+const moles = document.querySelectorAll('.mole');
+const scoreEl = document.getElementById('score');
+const hitSound = document.getElementById('hitSound');
+const startBtn = document.getElementById('startBtn');
+
+let score = 0;
+let gameInterval;
+let moleTimeout;
+
+function randomHole() {
+  return holes[Math.floor(Math.random() * holes.length)];
+}
+
+function showMole() {
+  const mole = randomHole().querySelector('.mole');
+  mole.classList.add('up');
+
+  moleTimeout = setTimeout(() => {
+    mole.classList.remove('up');
+  }, 800); // 地鼠顯示時間
+}
+
+function startGame() {
+  score = 0;
+  scoreEl.textContent = `分數: ${score}`;
+  if (gameInterval) clearInterval(gameInterval);
+
+  gameInterval = setInterval(showMole, 1000); // 每秒出現一個地鼠
+}
+
+// 打擊事件
+moles.forEach(mole => {
+  mole.addEventListener('click', () => {
+    if (mole.classList.contains('up')) {
+      score++;
+      scoreEl.textContent = `分數: ${score}`;
+      mole.classList.remove('up');
+      hitSound.currentTime = 0;
+      hitSound.play();
+    }
+  });
+});
+
+// 開始遊戲按鈕
+startBtn.addEventListener('click', startGame);
+</script>
+</body>
+</html>
