@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>計算機工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .header {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .author {
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+        }
+
+        .calculator {
+            background: rgba(20, 20, 30, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .calculator h2 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        .calculator p {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 20px;
+            font-size: 13px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .display {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #00ff88;
+            text-align: right;
+            font-weight: bold;
+            min-height: 50px;
+            word-wrap: break-word;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .buttons.full-width {
+            grid-template-columns: 1fr;
+        }
+
+        .btn {
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn.operator {
+            background: rgba(79, 172, 254, 0.3);
+            border-color: rgba(79, 172, 254, 0.5);
+            color: #4facfe;
+        }
+
+        .btn.operator:hover {
+            background: rgba(79, 172, 254, 0.4);
+        }
+
+        .btn.equals {
+            background: rgba(79, 172, 254, 0.8);
+            grid-column: span 2;
+            font-size: 16px;
+        }
+
+        .btn.equals:hover {
+            background: rgba(79, 172, 254, 1);
+        }
+
+        .btn.clear {
+            background: rgba(245, 87, 108, 0.3);
+            border-color: rgba(245, 87, 108, 0.5);
+            color: #f5576c;
+            grid-column: span 2;
+        }
+
+        .btn.clear:hover {
+            background: rgba(245, 87, 108, 0.4);
+        }
+
+        .btn.function {
+            background: rgba(16, 185, 129, 0.3);
+            border-color: rgba(16, 185, 129, 0.5);
+            color: #10b981;
+            font-size: 12px;
+        }
+
+        .btn.function:hover {
+            background: rgba(16, 185, 129, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .calculator {
+                padding: 20px;
+            }
+
+            .display {
+                font-size: 24px;
+            }
+
+            .btn {
+                padding: 12px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/" class="back-btn">← 返回</a>
+        <div class="author">作者：陳宗偉</div>
+    </div>
+
+    <div class="container">
+        <!-- 一般計算機 -->
+        <div class="calculator">
+            <h2>一般計算機</h2>
+            <p>可用於一般四則運算，支持整數與小數點。</p>
+            <div class="display" id="display1">0</div>
+            <div class="buttons">
+                <button class="btn clear" onclick="clearDisplay('calc1')">AC</button>
+                <button class="btn clear" onclick="deleteLast('calc1')">DEL</button>
+                <button class="btn operator" onclick="appendOperator('calc1', '(')">(</button>
+                <button class="btn operator" onclick="appendOperator('calc1', ')')">)</button>
+                
+                <button class="btn" onclick="appendNumber('calc1', '7')">7</button>
+                <button class="btn" onclick="appendNumber('calc1', '8')">8</button>
+                <button class="btn" onclick="appendNumber('calc1', '9')">9</button>
+                <button class="btn operator" onclick="appendOperator('calc1', '÷')">÷</button>
+                
+                <button class="btn" onclick="appendNumber('calc1', '4')">4</button>
+                <button class="btn" onclick="appendNumber('calc1', '5')">5</button>
+                <button class="btn" onclick="appendNumber('calc1', '6')">6</button>
+                <button class="btn operator" onclick="appendOperator('calc1', '×')">×</button>
+                
+                <button class="btn" onclick="appendNumber('calc1', '1')">1</button>
+                <button class="btn" onclick="appendNumber('calc1', '2')">2</button>
+                <button class="btn" onclick="appendNumber('calc1', '3')">3</button>
+                <button class="btn operator" onclick="appendOperator('calc1', '-')">-</button>
+                
+                <button class="btn" onclick="appendNumber('calc1', '0')">0</button>
+                <button class="btn" onclick="appendNumber('calc1', '.')">.</button>
+                <button class="btn operator" onclick="appendOperator('calc1', '+')">+</button>
+            </div>
+            <div class="buttons full-width">
+                <button class="btn equals" onclick="calculate('calc1')">=</button>
+            </div>
+        </div>
+
+        <!-- 函數計算機 -->
+        <div class="calculator">
+            <h2>函數計算機</h2>
+            <p>支持 sin、cos、tan、log、ln、sqrt、階乘與反三角函數。</p>
+            <div class="display" id="display2">0</div>
+            <div class="buttons">
+                <button class="btn clear" onclick="clearDisplay('calc2')">AC</button>
+                <button class="btn clear" onclick="deleteLast('calc2')">DEL</button>
+                <button class="btn operator" onclick="appendOperator('calc2', '(')">(</button>
+                <button class="btn operator" onclick="appendOperator('calc2', ')')">)</button>
+                
+                <button class="btn function" onclick="appendFunction('calc2', 'sin')">sin</button>
+                <button class="btn function" onclick="appendFunction('calc2', 'cos')">cos</button>
+                <button class="btn function" onclick="appendFunction('calc2', 'tan')">tan</button>
+                <button class="btn function" onclick="appendFunction('calc2', 'log')">log</button>
+                
+                <button class="btn function" onclick="appendFunction('calc2', 'ln')">ln</button>
+                <button class="btn function" onclick="appendFunction('calc2', 'sqrt')">√</button>
+                <button class="btn operator" onclick="appendOperator('calc2', '×')">×</button>
+                <button class="btn operator" onclick="appendOperator('calc2', '÷')">÷</button>
+                
+                <button class="btn" onclick="appendNumber('calc2', '7')">7</button>
+                <button class="btn" onclick="appendNumber('calc2', '8')">8</button>
+                <button class="btn" onclick="appendNumber('calc2', '9')">9</button>
+                <button class="btn operator" onclick="appendOperator('calc2', '-')">-</button>
+                
+                <button class="btn" onclick="appendNumber('calc2', '4')">4</button>
+                <button class="btn" onclick="appendNumber('calc2', '5')">5</button>
+                <button class="btn" onclick="appendNumber('calc2', '6')">6</button>
+                <button class="btn operator" onclick="appendOperator('calc2', '+')">+</button>
+                
+                <button class="btn" onclick="appendNumber('calc2', '1')">1</button>
+                <button class="btn" onclick="appendNumber('calc2', '2')">2</button>
+                <button class="btn" onclick="appendNumber('calc2', '3')">3</button>
+                <button class="btn operator" onclick="appendOperator('calc2', '^')">x^y</button>
+                
+                <button class="btn" onclick="appendNumber('calc2', '0')">0</button>
+                <button class="btn" onclick="appendNumber('calc2', '.')">.</button>
+                <button class="btn function" onclick="appendOperator('calc2', 'π')">π</button>
+                <button class="btn function" onclick="appendOperator('calc2', 'e')">e</button>
+            </div>
+            <div class="buttons full-width">
+                <button class="btn equals" onclick="calculate('calc2')">=</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let displays = {
+            calc1: { value: '0', history: '' },
+            calc2: { value: '0', history: '' }
+        };
+
+        function updateDisplay(calcId) {
+            const displayElement = document.getElementById(calcId === 'calc1' ? 'display1' : 'display2');
+            displayElement.textContent = displays[calcId].value || '0';
+        }
+
+        function clearDisplay(calcId) {
+            displays[calcId].value = '0';
+            displays[calcId].history = '';
+            updateDisplay(calcId);
+        }
+
+        function deleteLast(calcId) {
+            displays[calcId].value = displays[calcId].value.toString().slice(0, -1) || '0';
+            updateDisplay(calcId);
+        }
+
+        function appendNumber(calcId, num) {
+            if (displays[calcId].value === '0' && num !== '.') {
+                displays[calcId].value = num;
+            } else if (num === '.' && displays[calcId].value.includes('.')) {
+                return;
+            } else {
+                displays[calcId].value += num;
+            }
+            updateDisplay(calcId);
+        }
+
+        function appendOperator(calcId, op) {
+            if (op === 'π') {
+                displays[calcId].value += Math.PI.toString().slice(0, 6);
+            } else if (op === 'e') {
+                displays[calcId].value += Math.E.toString().slice(0, 6);
+            } else {
+                displays[calcId].value += ` ${op} `;
+            }
+            updateDisplay(calcId);
+        }
+
+        function appendFunction(calcId, func) {
+            displays[calcId].value += func + '(';
+            updateDisplay(calcId);
+        }
+
+        function calculate(calcId) {
+            try {
+                let expression = displays[calcId].value;
+                
+                // 替換顯示符號為JavaScript符號
+                expression = expression.replace(/÷/g, '/').replace(/×/g, '*');
+                expression = expression.replace(/π/g, Math.PI);
+                expression = expression.replace(/e/g, Math.E);
+                
+                // 處理sin、cos、tan等函數
+                expression = expression.replace(/sin\(/g, 'Math.sin(');
+                expression = expression.replace(/cos\(/g, 'Math.cos(');
+                expression = expression.replace(/tan\(/g, 'Math.tan(');
+                expression = expression.replace(/log\(/g, 'Math.log10(');
+                expression = expression.replace(/ln\(/g, 'Math.log(');
+                expression = expression.replace(/sqrt\(/g, 'Math.sqrt(');
+                expression = expression.replace(/\^/g, '**');
+                
+                // 處理階乘
+                expression = expression.replace(/(\d+)!/g, (match, num) => {
+                    let result = 1;
+                    for (let i = 2; i <= num; i++) {
+                        result *= i;
+                    }
+                    return result;
+                });
+
+                const result = eval(expression);
+                displays[calcId].value = parseFloat(result.toFixed(10)).toString();
+            } catch (e) {
+                displays[calcId].value = '錯誤';
+            }
+            updateDisplay(calcId);
+        }
+    </script>
+</body>
+</html>
